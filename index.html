@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html>
+    <head> <!--This section calls to other code as reference for both the functionality and the style of the webpage.-->
+        <meta charset = 'utf-8'>
+        <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+        <title>FPP Maintenance Reporting Tool</title>
+
+        <!--Stylesheet-->
+        <link rel = "stylesheet" href = 'Reporting Map/FPPReportingMapStyle.css'>
+
+        <!--for mapbox-->
+        <script src='https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css' rel='stylesheet' />
+        
+        <!--for sheetrock-->
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sheetrock/1.1.4/dist/sheetrock.min.js"></script> 
+
+        <!--Config-->
+        <script src = 'Reporting Map/config.js'></script>
+
+    </head>
+
+    <body><!--This section creates the style combined with the Stylesheet referenced in the head. It is the contents of the webage.-->
+            <!--Much of the style was used from OntarioParks.ca to create a page that looks as professional as possible.-->
+
+        <!--Black "NavBar"-->
+        <div id = "nav">
+        </div>
+        <!--Large Picture-->
+        <div id = "image">
+        <img src = 'Reporting Map/Images/IMG_1805.jpg' width="100%" height="auto">
+        </div>
+
+        <!--OP Banner-->
+        <div  id = "opbanner" class="banner">
+        <img id = "opimage" src="https://www.ontarioparks.ca/images/svg/op-logo-vertical-colour.svg" width="60" height="100" alt="Ontario Parks Logo">
+        </div>
+     
+        <!--Add basemap-->
+        <!--This first section contains the text before adding the map-->
+        <div  class = 'div3'>
+            <h2 id = "hwriting">
+            Take a look at your issue on the map!
+            </h2>
+            
+            <p id = "writing">Thank you for taking the time to complete this form. Your contibution will assist staff in keeping Fitzroy beautiful while exploring the benefits of citizen science.</p>
+        </div>
+        <br>
+        <hr id = "line">
+        <br>
+
+        <!--This section creates the map that the user's inputted point will then be drawn on.-->
+        <div id = 'map' onload="draw"></div>
+            <script>
+                var token = config.token
+                mapboxgl.accessToken = token;
+                var map = new mapboxgl.Map({
+                    container: 'map', // container ID
+                    style: config.style, // style URL
+                    center: config.center, // starting position 
+                    zoom: config.zoom, // starting zoom
+                });
+            </script>
+
+        <!--Sheetrock method to add the user submitted data to the map created above-->
+        <div id = 'display'></div>
+        <script>
+            var marker = new mapboxgl.Marker(); //create a new marker
+            sheetrock({
+                url: config.sheeturl, //URL to google spreadsheet
+                callback: draw   }); //runs the draw function
+
+            function draw(error, options, response) { //This function draws the point based off the data submitted by the user.
+                data=response.rows; //get the responses
+                lendata = (data.length) - 1 //find the last response
+                marker.setLngLat([data[lendata].cellsArray[7], data[lendata].cellsArray[6]]).addTo(map) //Set the longitude and latitude of the point based off the last row
+                marker.setPopup(new mapboxgl.Popup() //create a pop-up with additional information about the point
+                .setHTML("<p><b>Issue:</b></p>"+ data[lendata].cellsArray[4]))        
+            }
+
+        </script>
+        <!--Bottom of the page with Carleton logo-->
+        <div id = "carletonDiv">
+            <img id = "carletonImg" src="Reporting Map/Images/B_Logo_H-RGBRedBlackonLight72_130821.png" width="170" height="100"  alt="Carleton University Logo">
+        </div>
+    </body>
+</html>
